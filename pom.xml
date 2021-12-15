@@ -11,22 +11,19 @@
 	<groupId>tech.jgross</groupId>
 	<artifactId>service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>service</name>
 	<description>The Justin Gross service.</description>
+	<name>service</name>
 	<properties>
 		<java.version>11</java.version>
 	</properties>
 	<dependencies>
+		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-webflux -->
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-webflux</artifactId>
+				<version>2.6.0</version>
 		</dependency>
-
-    <dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-thymeleaf</artifactId>
-		</dependency>
-
+		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
@@ -45,35 +42,43 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/org.mockito/mockito-inline -->
-		<!-- <dependency>
-				<groupId>org.mockito</groupId>
-				<artifactId>mockito-inline</artifactId>
-				<version>3.9.0</version>
-				<scope>test</scope>
-		</dependency> -->
+		<dependency>
+			<groupId>io.projectreactor</groupId>
+			<artifactId>reactor-test</artifactId>
+			<scope>test</scope>
+		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/org.powermock/powermock-api-mockito2 -->
-		<!-- <dependency>
-				<groupId>org.powermock</groupId>
-				<artifactId>powermock-api-mockito2</artifactId>
-				<version>2.0.9</version>
-				<scope>test</scope>
-		</dependency> -->
-
-		<!-- https://mvnrepository.com/artifact/org.powermock/powermock-module-junit4 -->
-		<!-- <dependency>
-				<groupId>org.powermock</groupId>
-				<artifactId>powermock-module-junit4</artifactId>
-				<version>2.0.9</version>
-				<scope>test</scope>
-		</dependency> -->
+		<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-integration</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
 
+		 <dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-rsocket</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-rsocket</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-messaging</artifactId>
+		</dependency>
 		<dependency>
 				<groupId>com.h2database</groupId>
 				<artifactId>h2</artifactId>
@@ -132,8 +137,15 @@
 								</goals>
 						</execution>
 						<execution>
-								<id>report</id>
+								<id>report-on-prepare</id>
 								<phase>prepare-package</phase>
+								<goals>
+										<goal>report</goal>
+								</goals>
+						</execution>
+						<execution>
+								<id>report-on-test</id>
+								<phase>test</phase>
 								<goals>
 										<goal>report</goal>
 								</goals>
@@ -143,4 +155,89 @@
 		</plugins>
 	</build>
 
+	<profiles>
+			<profile>
+					<id>dev</id>
+					<activation>
+							<activeByDefault>true</activeByDefault>
+					</activation>
+					<properties>
+							<spring.profiles.active>dev</spring.profiles.active>
+							<server.error.include-stacktrace>always</server.error.include-stacktrace>
+							<spring.datasource.url>jdbc:h2:mem:testdb</spring.datasource.url>
+							<spring.datasource.username>sa</spring.datasource.username>
+							<spring.datasource.password></spring.datasource.password>
+							<spring.datasource.driverClassName>org.h2.Driver</spring.datasource.driverClassName>
+							<spring.jpa.show-sql>true</spring.jpa.show-sql>
+							<spring.jpa.properties.hibernate.dialect>org.hibernate.dialect.H2Dialect</spring.jpa.properties.hibernate.dialect>
+							<spring.jpa.hibernate.ddl-auto>update</spring.jpa.hibernate.ddl-auto>
+							<spring.h2.console.enabled>true</spring.h2.console.enabled>
+							<spring.h2.console.path>/h2-ui</spring.h2.console.path>
+							<spring.kafka.bootstrap-servers>services.jgross.tech:9092</spring.kafka.bootstrap-servers>
+							<spring.rsocket.server.port>7000</spring.rsocket.server.port>
+							<spring.rsocket.server.transport>websocket</spring.rsocket.server.transport>
+							<spring.rsocket.server.mapping-path>/rsocket</spring.rsocket.server.mapping-path>
+					</properties>
+			</profile>
+			<profile>
+					<id>prod</id>
+					<properties>
+							<spring.profiles.active>prod</spring.profiles.active>
+							<server.error.include-stacktrace>never</server.error.include-stacktrace>
+							<spring.datasource.url>jdbc:h2:mem:testdb</spring.datasource.url>
+							<spring.datasource.username>sa</spring.datasource.username>
+							<spring.datasource.password></spring.datasource.password>
+							<spring.datasource.driverClassName>org.h2.Driver</spring.datasource.driverClassName>
+							<spring.jpa.show-sql>true</spring.jpa.show-sql>
+							<spring.jpa.properties.hibernate.dialect>org.hibernate.dialect.H2Dialect</spring.jpa.properties.hibernate.dialect>
+							<spring.jpa.hibernate.ddl-auto>update</spring.jpa.hibernate.ddl-auto>
+							<spring.h2.console.enabled>true</spring.h2.console.enabled>
+							<spring.h2.console.path>/h2-ui</spring.h2.console.path>
+							<spring.kafka.bootstrap-servers>services.jgross.tech:9092</spring.kafka.bootstrap-servers>
+							<spring.rsocket.server.port>7000</spring.rsocket.server.port>
+							<spring.rsocket.server.transport>websocket</spring.rsocket.server.transport>
+							<spring.rsocket.server.mapping-path>/rsocket</spring.rsocket.server.mapping-path>
+					</properties>
+			</profile>
+			<profile>
+					<id>unit-test</id>
+					<properties>
+							<spring.profiles.active>unit-test</spring.profiles.active>
+							<server.error.include-stacktrace>always</server.error.include-stacktrace>
+							<spring.datasource.url>jdbc:h2:mem:testdb</spring.datasource.url>
+							<spring.datasource.username>sa</spring.datasource.username>
+							<spring.datasource.password></spring.datasource.password>
+							<spring.datasource.driverClassName>org.h2.Driver</spring.datasource.driverClassName>
+							<spring.jpa.show-sql>true</spring.jpa.show-sql>
+							<spring.jpa.properties.hibernate.dialect>org.hibernate.dialect.H2Dialect</spring.jpa.properties.hibernate.dialect>
+							<spring.jpa.hibernate.ddl-auto>update</spring.jpa.hibernate.ddl-auto>
+							<spring.h2.console.enabled>true</spring.h2.console.enabled>
+							<spring.h2.console.path>/h2-ui</spring.h2.console.path>
+							<spring.kafka.bootstrap-servers>localhost:9092</spring.kafka.bootstrap-servers>
+							<spring.rsocket.server.port>7000</spring.rsocket.server.port>
+							<spring.rsocket.server.transport>websocket</spring.rsocket.server.transport>
+							<spring.rsocket.server.mapping-path>/rsocket</spring.rsocket.server.mapping-path>
+					</properties>
+			</profile>
+			<profile>
+					<id>ix-test</id>
+					<properties>
+							<spring.profiles.active>ix-test</spring.profiles.active>
+							<server.error.include-stacktrace>always</server.error.include-stacktrace>
+							<spring.datasource.url>jdbc:h2:mem:testdb</spring.datasource.url>
+							<spring.datasource.username>sa</spring.datasource.username>
+							<spring.datasource.password></spring.datasource.password>
+							<spring.datasource.driverClassName>org.h2.Driver</spring.datasource.driverClassName>
+							<spring.jpa.show-sql>true</spring.jpa.show-sql>
+							<spring.jpa.properties.hibernate.dialect>org.hibernate.dialect.H2Dialect</spring.jpa.properties.hibernate.dialect>
+							<spring.jpa.hibernate.ddl-auto>update</spring.jpa.hibernate.ddl-auto>
+							<spring.h2.console.enabled>true</spring.h2.console.enabled>
+							<spring.h2.console.path>/h2-ui</spring.h2.console.path>
+							<spring.kafka.bootstrap-servers>localhost:9092</spring.kafka.bootstrap-servers>
+							<spring.rsocket.server.port>7000</spring.rsocket.server.port>
+							<spring.rsocket.server.transport>websocket</spring.rsocket.server.transport>
+							<spring.rsocket.server.mapping-path>/rsocket</spring.rsocket.server.mapping-path>
+					</properties>
+			</profile>
+	</profiles>
 </project>

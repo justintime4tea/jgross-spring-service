@@ -1,19 +1,20 @@
 package tech.jgross.service.entity;
 
 import java.io.Serializable;
-import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 import org.hibernate.annotations.Type;
 
+import lombok.Builder;
+import lombok.Data;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
-import lombok.Builder;
-import lombok.Data;
 
 
 @Builder
@@ -25,8 +26,7 @@ public class Message implements Serializable {
   @Id
   @Type(type = "uuid-char")
   @Column(unique = true, nullable = false, columnDefinition = "uuid")
-  @Builder.Default
-  private final @NonNull UUID id = UUID.randomUUID();
-  private final @NonNull String sender;
-  private @NonNull String data;
+  private final @NonNull String id;
+  private final @NonNull String userId;
+  private @NonNull String message;
 }
